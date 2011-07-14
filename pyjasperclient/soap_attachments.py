@@ -72,7 +72,7 @@ def with_soap_attachment(suds_method, attachment_data, *args, **kwargs):
     # Stuff everything into a request object
     headers = suds_method.client.options.headers.copy()
     headers.update(request_headers)
-    request = Request(suds_method.client.location(), request_text)
+    request = Request(suds_method.client.options.location, request_text)
     request.headers = headers
     # Send the request
     response = suds_method.client.options.transport.send(request)

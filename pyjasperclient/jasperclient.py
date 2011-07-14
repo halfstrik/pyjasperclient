@@ -17,10 +17,11 @@ except ImportError, e:
     from elementtree import ElementTree as ET
 from suds.client import Client
 import email,re
+from soap_attachments import with_soap_attachment
 
 class JasperClient:
     def __init__(self,url,username,password):
-        self.client = Client(url,username=username,password=password)
+        self.client = Client(url+'?wsdl',username=username,password=password,location=url)
 
     def listReportsRaw(self,dir=""):
         ''' perform "list" request to JasperServer WS
@@ -49,7 +50,7 @@ class JasperClient:
                 reports.append(report)
         return reports
 
-    def putRaw(self, res=None, **kwargs):
+    def putRaw(self, **kwargs):
         ''' perform "put" request to asperServer WS
             and return xml result as is
             res - resource to create/modify'''
@@ -57,7 +58,15 @@ class JasperClient:
             operationName="put",
             **kwargs)
         return self.client.service.put(req)
-        
+
+    def putWithAttachment(self, binaryParam, **kwargs):
+        ''' I'll use @vezult's@ impruvment for adding attachments
+            http://stackoverflow.com/users/69952/vezult
+            http://stackoverflow.com/questions/6601107/how-to-send-a-file-through-soap-in-python'''
+        req = createRequest(
+            operationName="put",
+            **kwargs)
+        return with_soap_attachment(self.client.service.put,binaryParam,req)
     
     def runReport(self,uri,output="PDF",params={}):
         """ uri should be report URI on JasperServer
