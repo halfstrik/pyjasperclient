@@ -49,8 +49,15 @@ class JasperClient:
                 reports.append(report)
         return reports
 
-    def putRaw(self):
-        pass
+    def putRaw(self, res=None, **kwargs):
+        ''' perform "put" request to asperServer WS
+            and return xml result as is
+            res - resource to create/modify'''
+        req = createRequest(
+            operationName="put",
+            **kwargs)
+        return self.client.service.put(req)
+        
     
     def runReport(self,uri,output="PDF",params={}):
         """ uri should be report URI on JasperServer
@@ -74,7 +81,7 @@ class JasperClient:
 def createRequest(**kwargs):
     r = ET.Element("request")
     r.set("operationName",kwargs.get("operationName", "list"))
-    r.set("locale",fwargs.get("locale","en"))
+    r.set("locale",kwargs.get("locale","en"))
     for argName,argValue in kwargs.get("arguments",{}).items():
         ar = ET.SubElement(r,"argument")
         ar.set("name",argName)
